@@ -1,6 +1,6 @@
 $ErrorActionPreference = "Stop"
 
-Write-Host "Setting up Python 3, Node.js/npm, pnpm, FFmpeg, ImageMagick, Ghostscript, Remotion tooling, Git Bash, Composio, Meta Ads MCP/CLI helpers, MarkItDown MCP, and Codex skills on Windows..."
+Write-Host "Setting up Python 3, Node.js/npm, pnpm, FFmpeg, ImageMagick, Ghostscript, Remotion tooling, Git Bash, Composio, Meta Ads CLI, MarkItDown MCP, and Codex skills on Windows..."
 
 if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
   throw "winget was not found. Install App Installer from the Microsoft Store, then run this script again."
@@ -75,70 +75,25 @@ enabled = true
   }
 }
 
-function Add-MetaAdsMcpConfig {
-  $codexDir = Join-Path $HOME ".codex"
-  $codexConfig = Join-Path $codexDir "config.toml"
-  $url = "https://mcp.facebook.com/ads"
-
-  New-Item -ItemType Directory -Force -Path $codexDir | Out-Null
-
-  if (-not (Test-Path $codexConfig)) {
-    New-Item -ItemType File -Path $codexConfig | Out-Null
-  }
-
-  $lines = Get-Content -Path $codexConfig -ErrorAction SilentlyContinue
-  $output = New-Object System.Collections.Generic.List[string]
-  $inSection = $false
-  $found = $false
-
-  foreach ($line in $lines) {
-    if ($line -match '^\[mcp_servers\.meta_ads\]$') {
-      $output.Add('[mcp_servers.meta_ads]')
-      $output.Add("url = ""$url""")
-      $inSection = $true
-      $found = $true
-      continue
-    }
-
-    if ($inSection -and $line -match '^\[.*\]$') {
-      $inSection = $false
-    }
-
-    if (-not $inSection) {
-      $output.Add($line)
-    }
-  }
-
-  if (-not $found) {
-    if ($output.Count -gt 0 -and $output[$output.Count - 1] -ne "") {
-      $output.Add("")
-    }
-    $output.Add('[mcp_servers.meta_ads]')
-    $output.Add("url = ""$url""")
-  }
-
-  Set-Content -Path $codexConfig -Value $output
-}
-
 function Install-MetaAdsCli {
   Write-Host "Installing Meta Ads CLI..."
 
   try {
+    python -m pip install --upgrade pipx
     py -3.12 -m pip index versions meta-ads *> $null
     pipx install --force --python "py -3.12" meta-ads
+    pipx ensurepath
     Write-Host "Meta Ads CLI installed."
   } catch {
     Write-Warning "Meta Ads CLI was not installed because no compatible meta-ads distribution was found or the install failed."
     Write-Warning "The official meta-ads package requires Python 3.12+ and currently ships wheels for CPython 3.12/3.13."
     Write-Warning "The setup date for this check is June 2, 2026."
-    Write-Warning "The Meta Ads MCP endpoint was still configured in ~/.codex/config.toml."
   }
 }
 
 Write-Host "Installing Memory MCP server..."
 npm install -g @modelcontextprotocol/server-memory
 Add-MemoryMcpConfig
-Add-MetaAdsMcpConfig
 Install-MetaAdsCli
 
 Write-Host "Installing ChatGPT Windows app..."

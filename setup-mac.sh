@@ -3,7 +3,7 @@ set -euo pipefail
 
 CODEX_PYTHON_TOOLS_VENV="$HOME/.codex/venvs/python-tools"
 
-echo "Setting up Python 3, Node.js/npm, pnpm, FFmpeg, Remotion tooling, Composio, Meta Ads MCP/CLI helpers, macOS MCP servers, and Codex skills on macOS..."
+echo "Setting up Python 3, Node.js/npm, pnpm, FFmpeg, Remotion tooling, Composio, Meta Ads CLI, macOS MCP servers, and Codex skills on macOS..."
 
 if ! command -v brew >/dev/null 2>&1; then
   echo "Homebrew not found. Installing Homebrew..."
@@ -121,50 +121,6 @@ EOF
   fi
 }
 
-configure_meta_ads_mcp() {
-  local codex_dir="$HOME/.codex"
-  local codex_config="$codex_dir/config.toml"
-  local url="https://mcp.facebook.com/ads"
-  local tmp_config
-
-  mkdir -p "$codex_dir"
-  touch "$codex_config"
-
-  tmp_config="$(mktemp "${TMPDIR:-/tmp}/codex-config.XXXXXX.toml")"
-
-  awk -v url="$url" '
-    BEGIN {
-      in_section = 0
-      found = 0
-    }
-    /^\[mcp_servers\.meta_ads\]$/ {
-      print "[mcp_servers.meta_ads]"
-      print "url = \"" url "\""
-      found = 1
-      in_section = 1
-      next
-    }
-    in_section && /^\[.*\]$/ {
-      in_section = 0
-    }
-    in_section {
-      next
-    }
-    {
-      print
-    }
-    END {
-      if (!found) {
-        print ""
-        print "[mcp_servers.meta_ads]"
-        print "url = \"" url "\""
-      }
-    }
-  ' "$codex_config" > "$tmp_config"
-
-  mv "$tmp_config" "$codex_config"
-}
-
 install_python_packages() {
   mkdir -p "$(dirname "$CODEX_PYTHON_TOOLS_VENV")"
   python3 -m venv "$CODEX_PYTHON_TOOLS_VENV"
@@ -187,22 +143,20 @@ install_meta_ads_cli() {
   if [[ -z "$meta_python" ]]; then
     echo "Meta Ads CLI was not installed because Python 3.13 was not found."
     echo "The official meta-ads package requires Python 3.12+ and currently ships wheels for CPython 3.12/3.13."
-    echo "The Meta Ads MCP endpoint was still configured in ~/.codex/config.toml."
     return
   fi
 
   if "$meta_python" -m pip index versions meta-ads >/dev/null 2>&1; then
     if pipx install --force --python "$meta_python" meta-ads; then
+      pipx ensurepath >/dev/null 2>&1 || true
       echo "Meta Ads CLI installed."
     else
       echo "Meta Ads CLI installation failed."
       echo "The official meta-ads package currently requires a compatible Python and wheel for your platform."
-      echo "The Meta Ads MCP endpoint was still configured in ~/.codex/config.toml."
     fi
   else
     echo "Meta Ads CLI was not installed because no compatible meta-ads distribution was found for $meta_python."
     echo "The setup date for this check is June 2, 2026."
-    echo "The Meta Ads MCP endpoint was still configured in ~/.codex/config.toml."
   fi
 }
 
@@ -387,7 +341,6 @@ EOF
 echo "Installing Memory MCP server..."
 npm install -g @modelcontextprotocol/server-memory
 configure_memory_mcp
-configure_meta_ads_mcp
 install_meta_ads_cli
 
 echo "Installing Python packages..."
