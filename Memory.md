@@ -45,6 +45,15 @@ This file is the shared project memory for this bootstrap repository.
   - `list_skills` now reports `present` or `missing` based on the managed `TARGET_DIR`.
   - Duplicate metadata files are deduplicated by canonical filename, and stale extras are surfaced in list output.
 
+### 2026-06-24 - Documents bundle now provisions Node document packages
+
+- Trigger: a request to include the currently missing local document packages in `install_tools`.
+- Goal: make the `documents` bundle provision both the Python document runtime and the Node-based document packages needed for extraction and generation tasks.
+- Results:
+  - `.bootstrap/lib/tool-catalog.ps1` now installs `mammoth`, `docx`, `xlsx`, `pptxgenjs`, and `pdf-parse` for global and project document bundle installs.
+  - `.bootstrap/lib/tool-catalog.sh` mirrors the same behavior for macOS/Linux.
+  - Bundle metadata and user-facing docs were updated to describe the expanded `documents` runtime.
+
 ## Open Points
 
 - Optionally add more skill sources to the catalog later.

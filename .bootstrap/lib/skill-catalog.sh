@@ -102,6 +102,8 @@ list_supported_skills() {
 usage_install() {
   cat <<'EOF'
 Usage:
+  ./scripts/install_skills.sh global all
+  ./scripts/install_skills.sh workspace drawio-diagrams-enhanced
   ./scripts/install_skills.sh all
   ./scripts/install_skills.sh frontend-design humanizer
   ./scripts/install_skills.sh ui-ux-pro-max pptx jira-expert
@@ -713,6 +715,24 @@ bootstrap_install_skills() {
         mode="$2"
         shift 2
         ;;
+      global)
+        if [[ -z "$mode" && ${#requested[@]} -eq 0 ]]; then
+          mode="global"
+          shift
+        else
+          requested+=("$1")
+          shift
+        fi
+        ;;
+      workspace|project)
+        if [[ -z "$mode" && ${#requested[@]} -eq 0 ]]; then
+          mode="project"
+          shift
+        else
+          requested+=("$1")
+          shift
+        fi
+        ;;
       -h|--help)
         usage_install
         return
@@ -732,10 +752,13 @@ bootstrap_install_skills() {
   if [[ -z "$mode" ]]; then
     mode="$(prompt_mode)"
   fi
-  [[ "$mode" == "global" || "$mode" == "project" ]] || {
+  [[ "$mode" == "global" || "$mode" == "project" || "$mode" == "workspace" ]] || {
     echo "Error: mode must be 'global' or 'project'." >&2
     return 1
   }
+  if [[ "$mode" == "workspace" ]]; then
+    mode="project"
+  fi
 
   if [[ "${requested[0]}" == "all" ]]; then
     requested=()

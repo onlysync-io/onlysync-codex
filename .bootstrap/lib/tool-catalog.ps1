@@ -24,11 +24,43 @@ function ConvertTo-ShellValue {
   return "'$escaped'"
 }
 
+function Refresh-SessionPath {
+  $machinePath = [Environment]::GetEnvironmentVariable("Path", "Machine")
+  $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
+  $combined = @($machinePath, $userPath) -join ";"
+  if (-not [string]::IsNullOrWhiteSpace($combined)) {
+    $env:Path = $combined
+  }
+}
+
+function Get-InstalledPythonCommand {
+  $candidates = @(@(
+    (Join-Path $env:LOCALAPPDATA "Programs\Python\Python312\python.exe"),
+    (Join-Path $env:LOCALAPPDATA "Programs\Python\Python313\python.exe"),
+    (Join-Path $env:ProgramFiles "Python312\python.exe"),
+    (Join-Path ${env:ProgramFiles(x86)} "Python312\python.exe")
+  ) | Where-Object { $_ -and (Test-Path $_) })
+
+  if ($candidates.Count -gt 0) {
+    return $candidates[0]
+  }
+
+  return $null
+}
+
 function Invoke-BootstrapPython {
   param(
     [Parameter(ValueFromRemainingArguments = $true)]
     [string[]] $Arguments
   )
+
+  Refresh-SessionPath
+
+  $installedPython = Get-InstalledPythonCommand
+  if ($installedPython) {
+    & $installedPython @Arguments
+    return
+  }
 
   if (Get-Command py -ErrorAction SilentlyContinue) {
     & py -3.12 @Arguments
@@ -64,7 +96,7 @@ function Write-ToolMetadata {
   $lines = @(
     "NAME=$(ConvertTo-ShellValue $Name)"
     "MODE=$(ConvertTo-ShellValue $Mode)"
-    "TYPE=$(ConvertTo-ShellValue "bundle")"
+    "TYPE=$(ConvertTo-ShellValue 'bundle')"
     "SCOPE_SUPPORT=$(ConvertTo-ShellValue $ScopeSupport)"
     "TARGET_DIR=$(ConvertTo-ShellValue $TargetDir)"
     "COMMANDS=$(ConvertTo-ShellValue $Commands)"
@@ -117,11 +149,11 @@ function Get-SelectedToolMetadata {
 
   foreach ($file in $files) {
     $meta = Read-ToolMetadata $file.FullName
-    if (-not $meta["NAME"] -or -not $meta["MODE"]) { continue }
-    if ($ModeFilter -and $meta["MODE"] -ne $ModeFilter) { continue }
+    if (-not $meta['NAME'] -or -not $meta['MODE']) { continue }
+    if ($ModeFilter -and $meta['MODE'] -ne $ModeFilter) { continue }
 
-    $key = "$($meta["MODE"])::$($meta["NAME"])"
-    $canonicalPath = Get-CanonicalToolMetadataPath -Name $meta["NAME"] -Mode $meta["MODE"]
+    $key = "$($meta['MODE'])::$($meta['NAME'])"
+    $canonicalPath = Get-CanonicalToolMetadataPath -Name $meta['NAME'] -Mode $meta['MODE']
 
     if (-not $selected.ContainsKey($key)) {
       $selected[$key] = [pscustomobject]@{ Path = $file.FullName; Meta = $meta }
@@ -151,7 +183,7 @@ function Ensure-AgentsFile {
   New-Item -ItemType Directory -Force -Path (Split-Path -Parent $Path) | Out-Null
   if (-not (Test-Path $Path)) {
     Set-Content -Path $Path -Value @(
-      "- Always use real umlauts in externally visible text: ``ä, ö, ü, Ä, Ö, Ü, ß``."
+      '- Always use real umlauts in externally visible text: `ä, ö, ü, Ä, Ö, Ü, ß`.'
       ""
       "## $Title"
     )
@@ -181,9 +213,10 @@ function Sync-AgentsBlock {
   }
   $managed += $EndMarker
   $managedText = ($managed -join "`r`n")
+  $pattern = "(?s)$([regex]::Escape($StartMarker)).*?$([regex]::Escape($EndMarker))"
 
-  if ($existing -match "(?s)$([regex]::Escape($StartMarker)).*?$([regex]::Escape($EndMarker))") {
-    $updated = [regex]::Replace($existing, "(?s)$([regex]::Escape($StartMarker)).*?$([regex]::Escape($EndMarker))", [System.Text.RegularExpressions.MatchEvaluator]{ param($m) $managedText })
+  if ($existing -match $pattern) {
+    $updated = [regex]::Replace($existing, $pattern, [System.Text.RegularExpressions.MatchEvaluator]{ param($m) $managedText })
   } else {
     $updated = $existing.TrimEnd() + "`r`n`r`n" + $managedText + "`r`n"
   }
@@ -210,9 +243,9 @@ function Sync-ProjectAgentsFile {
 
   foreach ($entry in $selected.Selected) {
     $meta = $entry.Meta
-    $bundleLines += "- ``$($meta["NAME"])``: Target ``$($meta["TARGET_DIR"])`` | Commands ``$($meta["COMMANDS"])`` | Packages ``$($meta["PACKAGES"])``"
-    if ($meta["NOTES"]) {
-      $bundleLines += "  Note: $($meta["NOTES"])"
+    $bundleLines += "- ``$($meta['NAME'])``: Target ``$($meta['TARGET_DIR'])`` | Commands ``$($meta['COMMANDS'])`` | Packages ``$($meta['PACKAGES'])``"
+    if ($meta['NOTES']) {
+      $bundleLines += "  Note: $($meta['NOTES'])"
     }
   }
 
@@ -263,6 +296,19 @@ function Install-DocumentsPythonProject {
   Ensure-ProjectPythonWrappers -PythonExe $pythonExe
 }
 
+function Install-DocumentsNodeGlobal {
+  npm install -g mammoth docx xlsx pptxgenjs pdf-parse
+}
+
+function Install-DocumentsNodeProject {
+  $runtimeRoot = Join-Path $script:ProjectToolsDir "documents"
+  New-Item -ItemType Directory -Force -Path $runtimeRoot | Out-Null
+  if (-not (Test-Path (Join-Path $runtimeRoot "package.json"))) {
+    npm init -y --prefix $runtimeRoot *> $null
+  }
+  npm install --prefix $runtimeRoot mammoth docx xlsx pptxgenjs pdf-parse *> $null
+}
+
 function Install-BrowserAutomationProject {
   $runtimeRoot = Join-Path $script:ProjectToolsDir "browser-automation"
   New-Item -ItemType Directory -Force -Path $runtimeRoot | Out-Null
@@ -291,7 +337,7 @@ function Install-ToolBundle {
       winget install --id "OpenJS.NodeJS.LTS" --exact --source winget --accept-package-agreements --accept-source-agreements
       winget install --id "Git.Git" --exact --source winget --accept-package-agreements --accept-source-agreements
       winget install --id "BurntSushi.ripgrep.MSVC" --exact --source winget --accept-package-agreements --accept-source-agreements
-      python -m pip install --upgrade pip pipx
+      Invoke-BootstrapPython -m pip install --upgrade pip pipx
       pipx ensurepath
       Write-ToolMetadata -Name $Name -Mode $Mode -ScopeSupport "global_only" -TargetDir "$env:ProgramFiles;$env:USERPROFILE\.codex\bin" -Commands "python,node,npm,git,rg,pipx" -Packages "winget:python,node,git,ripgrep|pip:pipx" -Notes "Core system tools are installed globally only."
     }
@@ -299,12 +345,14 @@ function Install-ToolBundle {
       if ($Mode -eq "global") {
         winget install --id "JohnMacFarlane.Pandoc" --exact --source winget --accept-package-agreements --accept-source-agreements *> $null
         Install-DocumentsPythonGlobal
-        Write-ToolMetadata -Name $Name -Mode $Mode -ScopeSupport "global_or_project" -TargetDir $script:GlobalPythonVenv -Commands "codex-python,codex-markitdown,pandoc" -Packages "winget:pandoc|python:openpyxl,python-docx,python-pptx,markitdown,pypdf,pymupdf" -Notes "Global document workbench for Office generation, extraction, and PDF parsing, including PyMuPDF."
+        Install-DocumentsNodeGlobal
+        Write-ToolMetadata -Name $Name -Mode $Mode -ScopeSupport "global_or_project" -TargetDir $script:GlobalPythonVenv -Commands "codex-python,codex-markitdown,pandoc" -Packages "winget:pandoc|python:openpyxl,python-docx,python-pptx,markitdown,pypdf,pymupdf|npm:mammoth,docx,xlsx,pptxgenjs,pdf-parse" -Notes "Global document workbench for Office generation, extraction, and PDF parsing, including PyMuPDF and Node document parsers and generators."
         Sync-GlobalAgentsFile
       } else {
         Install-DocumentsPythonProject
-        $projectCommands = "$(Join-Path $script:ProjectBinDir "codex-python.cmd"),$(Join-Path $script:ProjectBinDir "codex-markitdown.cmd")"
-        Write-ToolMetadata -Name $Name -Mode $Mode -ScopeSupport "global_or_project" -TargetDir (Join-Path $script:ProjectToolsDir "documents") -Commands $projectCommands -Packages "python:openpyxl,python-docx,python-pptx,markitdown,pypdf,pymupdf" -Notes "Workspace mode installs the Python document tools locally. Pandoc remains a globally preferred native tool."
+        Install-DocumentsNodeProject
+        $projectCommands = "$(Join-Path $script:ProjectBinDir 'codex-python.cmd'),$(Join-Path $script:ProjectBinDir 'codex-markitdown.cmd')"
+        Write-ToolMetadata -Name $Name -Mode $Mode -ScopeSupport "global_or_project" -TargetDir (Join-Path $script:ProjectToolsDir "documents") -Commands $projectCommands -Packages "python:openpyxl,python-docx,python-pptx,markitdown,pypdf,pymupdf|npm:mammoth,docx,xlsx,pptxgenjs,pdf-parse" -Notes "Workspace mode creates a local document runtime with Python and Node packages. Pandoc remains a globally preferred native tool."
       }
     }
     "pdf-images" {
@@ -358,9 +406,9 @@ function Show-ToolInstallations {
 
   foreach ($entry in $selected.Selected) {
     $meta = $entry.Meta
-    Write-Host "- $($meta["NAME"]) | Mode: $($meta["MODE"]) | Scope: $($meta["SCOPE_SUPPORT"]) | Target: $($meta["TARGET_DIR"]) | Commands: $($meta["COMMANDS"]) | Updated: $($meta["UPDATED_AT"])"
-    Write-Host "  Packages: $($meta["PACKAGES"])"
-    Write-Host "  Note: $($meta["NOTES"])"
+    Write-Host "- $($meta['NAME']) | Mode: $($meta['MODE']) | Scope: $($meta['SCOPE_SUPPORT']) | Target: $($meta['TARGET_DIR']) | Commands: $($meta['COMMANDS']) | Updated: $($meta['UPDATED_AT'])"
+    Write-Host "  Packages: $($meta['PACKAGES'])"
+    Write-Host "  Note: $($meta['NOTES'])"
   }
 
   if ($selected.Stale.Count -gt 0) {
@@ -401,8 +449,8 @@ function Invoke-UpdateTools {
   }
   foreach ($file in $files) {
     $meta = $file.Meta
-    Write-Host "Updating $($meta["NAME"]) in $($meta["MODE"]) mode..."
-    Install-ToolBundle -Name $meta["NAME"] -Mode $meta["MODE"]
+    Write-Host "Updating $($meta['NAME']) in $($meta['MODE']) mode..."
+    Install-ToolBundle -Name $meta['NAME'] -Mode $meta['MODE']
   }
   Write-Host ""
   Show-ToolInstallations

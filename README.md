@@ -89,6 +89,14 @@ Available commands:
 ./scripts/list_skills.sh
 ```
 
+Windows:
+
+```powershell
+.\scripts\install_skills.ps1
+.\scripts\update_skills.ps1
+.\scripts\list_skills.ps1
+```
+
 ### 5. Optionally Wire In the IMAP MCP Server
 
 If you want email access over IMAP as an MCP server, you can use the published `imap-mcp-server` directly through `npx`. This project includes a thin npm wrapper:
@@ -134,7 +142,7 @@ bootstrap-agent/
 - `setup-mac.sh`
 - `setup-windows.ps1`
 
-These install the global standard bundles for the workbench. That includes native base tools for Git, Curl, `rg`, Draw.io, PDF/image work, and browser automation, plus a central Python workbench under `~/.codex/workbench/python` for Office and document tasks. Daily-use wrappers such as `codex-python` and `codex-markitdown` are also created there, and the bundled document stack includes `pypdf`, `pymupdf`, and the native Homebrew `pymupdf` formula on macOS.
+These install the global standard bundles for the workbench. That includes native base tools for Git, Curl, `rg`, Draw.io, PDF/image work, and browser automation, plus a central Python workbench under `~/.codex/workbench/python` for Office and document tasks. The `documents` bundle also installs Node-based document packages such as `mammoth`, `docx`, `xlsx`, `pptxgenjs`, and `pdf-parse`. Daily-use wrappers such as `codex-python` and `codex-markitdown` are also created there, and the bundled document stack includes `pypdf`, `pymupdf`, and the native Homebrew `pymupdf` formula on macOS.
 
 ### Bootstrap Internals
 
@@ -150,8 +158,12 @@ Contains templates, metadata, skill catalogs, and helper logic for initializatio
 - `scripts/update_tools.sh`
 - `scripts/list_tools.sh`
 - `scripts/install_skills.sh`
+- `scripts/install_skills.ps1`
+- `scripts/update_skill.ps1`
 - `scripts/update_skills.sh`
+- `scripts/update_skills.ps1`
 - `scripts/list_skills.sh`
+- `scripts/list_skills.ps1`
 
 These are thin entry points. The real logic lives under `.bootstrap/`.
 

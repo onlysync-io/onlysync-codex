@@ -427,6 +427,20 @@ install_project_python_documents() {
   ensure_python_wrapper "$python_venv/bin/python" "$PROJECT_BIN_DIR"
 }
 
+install_global_node_documents() {
+  npm install -g mammoth docx xlsx pptxgenjs pdf-parse >/dev/null
+}
+
+install_project_node_documents() {
+  local runtime_root="$PROJECT_TOOLS_DIR/documents"
+
+  mkdir -p "$runtime_root"
+  if [[ ! -f "$runtime_root/package.json" ]]; then
+    npm init -y --prefix "$runtime_root" >/dev/null
+  fi
+  npm install --prefix "$runtime_root" mammoth docx xlsx pptxgenjs pdf-parse >/dev/null
+}
+
 install_project_browser_runtime() {
   local runtime_root="$PROJECT_TOOLS_DIR/browser-automation"
 
@@ -470,11 +484,13 @@ install_documents_bundle() {
     ensure_homebrew
     run_brew install pandoc pymupdf
     install_global_python_documents
-    write_tool_metadata "documents" "$mode" "global_or_project" "$GLOBAL_PYTHON_VENV|/opt/homebrew|/usr/local" "codex-python,codex-markitdown,pandoc,pymupdf" "brew:pandoc,pymupdf|python:openpyxl,python-docx,python-pptx,markitdown,pypdf,pymupdf" "Global document workbench for Office generation, extraction, and PDF parsing, including PyMuPDF."
+    install_global_node_documents
+    write_tool_metadata "documents" "$mode" "global_or_project" "$GLOBAL_PYTHON_VENV|/opt/homebrew|/usr/local" "codex-python,codex-markitdown,pandoc,pymupdf" "brew:pandoc,pymupdf|python:openpyxl,python-docx,python-pptx,markitdown,pypdf,pymupdf|npm:mammoth,docx,xlsx,pptxgenjs,pdf-parse" "Global document workbench for Office generation, extraction, and PDF parsing, including PyMuPDF and Node document parsers and generators."
     sync_global_agents_file
   else
     install_project_python_documents
-    write_tool_metadata "documents" "$mode" "global_or_project" "$PROJECT_TOOLS_DIR/documents" "$PROJECT_BIN_DIR/codex-python,$PROJECT_BIN_DIR/codex-markitdown" "python:openpyxl,python-docx,python-pptx,markitdown,pypdf,pymupdf" "Workspace mode installs the Python document tools locally. Pandoc and the Homebrew PyMuPDF formula remain globally preferred native tools."
+    install_project_node_documents
+    write_tool_metadata "documents" "$mode" "global_or_project" "$PROJECT_TOOLS_DIR/documents" "$PROJECT_BIN_DIR/codex-python,$PROJECT_BIN_DIR/codex-markitdown" "python:openpyxl,python-docx,python-pptx,markitdown,pypdf,pymupdf|npm:mammoth,docx,xlsx,pptxgenjs,pdf-parse" "Workspace mode creates a local document runtime with Python and Node packages. Pandoc and the Homebrew PyMuPDF formula remain globally preferred native tools."
   fi
 }
 

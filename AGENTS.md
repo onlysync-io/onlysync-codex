@@ -49,8 +49,12 @@ If this project has not been initialized for a concrete user yet, work in exactl
 - `./scripts/list_tools.sh`
 - `./scripts/list_tools.ps1`
 - `./scripts/install_skills.sh`
+- `./scripts/install_skills.ps1`
+- `./scripts/update_skill.ps1`
 - `./scripts/update_skills.sh`
+- `./scripts/update_skills.ps1`
 - `./scripts/list_skills.sh`
+- `./scripts/list_skills.ps1`
 
 
 
