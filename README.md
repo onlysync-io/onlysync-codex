@@ -73,6 +73,7 @@ Default bundles:
 - `pdf-images`
 - `diagrams`
 - `browser-automation`
+- `composio-cli`
 
 ### 4. Install Skills Intentionally
 
