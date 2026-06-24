@@ -13,7 +13,7 @@ The design is intentionally two-step:
 - global workbench tooling for macOS and Windows
 - tool bundles installable in global or project mode
 - structured onboarding for the real agent
-- skills installable and updateable from original repositories
+- skills installable and updatable from original repositories
 - a clean future project structure, with bootstrap internals living under `.bootstrap/`
 
 ## Quick Start
@@ -53,7 +53,7 @@ The agent should then:
 
 ### 3. Install Tool Bundles Intentionally
 
-The tool scripts ask for a target mode:
+The tool scripts use a target mode:
 
 - `global`
 - `project`
@@ -82,6 +82,18 @@ Accepted mode forms are now the same for tools and skills on both platforms:
 - `--mode project ...`
 - on PowerShell additionally `-Mode global ...` and `-Mode project ...`
 
+Examples:
+
+```bash
+./scripts/install_tools.sh global all
+./scripts/install_tools.sh project documents browser-automation
+```
+
+```powershell
+.\scripts\install_tools.ps1 -Mode global all
+.\scripts\install_tools.ps1 project documents browser-automation
+```
+
 Default bundles:
 
 - `core`
@@ -93,7 +105,7 @@ Default bundles:
 
 ### 4. Install Skills Intentionally
 
-The skill scripts also ask for a target mode:
+The skill scripts also use a target mode:
 
 - `global`
 - `project`
@@ -121,6 +133,18 @@ Accepted mode forms are the same as for tools:
 - `--mode global ...`
 - `--mode project ...`
 - on PowerShell additionally `-Mode global ...` and `-Mode project ...`
+
+Examples:
+
+```bash
+./scripts/install_skills.sh global all
+./scripts/install_skills.sh project drawio-diagrams-enhanced
+```
+
+```powershell
+.\scripts\install_skills.ps1 -Mode global all
+.\scripts\install_skills.ps1 project drawio-diagrams-enhanced
+```
 
 ### 5. Optionally Wire In the IMAP MCP Server
 
@@ -184,6 +208,7 @@ Contains templates, metadata, skill catalogs, and helper logic for initializatio
 - `scripts/list_tools.sh`
 - `scripts/install_skills.sh`
 - `scripts/install_skills.ps1`
+- `scripts/update_skill.sh`
 - `scripts/update_skill.ps1`
 - `scripts/update_skills.sh`
 - `scripts/update_skills.ps1`
