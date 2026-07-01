@@ -16,6 +16,6 @@ function Get-BashExecutable {
 
 $bashExe = Get-BashExecutable
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$shellScript = Join-Path $scriptDir "codex"
+$shellScript = Join-Path $scriptDir "cdx"
 
 & $bashExe --noprofile --norc $shellScript @Args

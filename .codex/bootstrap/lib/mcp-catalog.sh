@@ -205,18 +205,18 @@ prompt_mcp_selection() {
 usage_install_mcps() {
   cat <<'EOF'
 Usage:
-  ./bin/codex add mcp macos-mcp --scope global
-  ./bin/codex add mcp macos-mcp --scope project
-  ./bin/codex add mcp imap --scope global
+  ./bin/cdx add mcp macos-mcp --scope global
+  ./bin/cdx add mcp macos-mcp --scope project
+  ./bin/cdx add mcp imap --scope global
 EOF
 }
 
 usage_update_mcps() {
   cat <<'EOF'
 Usage:
-  ./bin/codex update mcps --scope both
-  ./bin/codex update mcps macos-mcp --scope global
-  ./bin/codex update mcps imap --scope project
+  ./bin/cdx update mcps --scope both
+  ./bin/cdx update mcps macos-mcp --scope global
+  ./bin/cdx update mcps imap --scope project
 EOF
 }
 

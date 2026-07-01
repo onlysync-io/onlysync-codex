@@ -13,7 +13,7 @@
 ## Stable Rules
 
 - Visible project files in this customer folder are the leading truth.
-- Managed extensions are handled through `./.codex/bin/codex`.
+- Managed extensions are handled through `./.codex/bin/cdx`.
 - External or irreversible actions require approval.
 
 ## Open Points
@@ -25,6 +25,6 @@
 
 ### __TIMESTAMP__ - Project initialized
 
-- Trigger: `codex init`
+- Trigger: `cdx init`
 - Result: created `Agents.md`, `Memory.md`, and `Decisions.md` in the customer folder
-- Next: install required Tools, Skills, and MCPs with `./.codex/bin/codex add ...`
+- Next: install required Tools, Skills, and MCPs with `./.codex/bin/cdx add ...`

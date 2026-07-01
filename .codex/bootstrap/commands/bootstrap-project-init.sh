@@ -145,8 +145,8 @@ EOF
   "initialized": true,
   "initializedAt": "$timestamp",
   "entrypoints": [
-    "bin/codex",
-    "bin/codex.ps1"
+    "bin/cdx",
+    "bin/cdx.ps1"
   ],
   "managedAreas": [
     "bootstrap/",
@@ -156,7 +156,7 @@ EOF
   "notes": [
     "The repository is intended to live as .codex inside a customer folder.",
     "Visible project docs live one directory above the repository root.",
-    "Tools, Skills, and MCPs are managed through a single codex CLI."
+    "Tools, Skills, and MCPs are managed through a single cdx CLI."
   ]
 }
 EOF
@@ -170,7 +170,7 @@ EOF
 This automation folder is reserved for the default project heartbeat.
 
 - Timezone: \`$timezone\`
-- Created by: \`codex init\`
+- Created by: \`cdx init\`
 EOF
   }
 
@@ -205,7 +205,7 @@ EOF
   echo "  $customer_dir/Decisions.md"
   echo
   echo "Next recommended commands:"
-  echo "  ./.codex/bin/codex add tool documents --scope project"
-  echo "  ./.codex/bin/codex add skill drawio-diagrams-enhanced --scope project"
-  echo "  ./.codex/bin/codex add mcp macos-mcp --scope global"
+  echo "  ./.codex/bin/cdx add tool documents --scope project"
+  echo "  ./.codex/bin/cdx add skill drawio-diagrams-enhanced --scope project"
+  echo "  ./.codex/bin/cdx add mcp macos-mcp --scope global"
 }

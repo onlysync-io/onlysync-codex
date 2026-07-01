@@ -22,7 +22,7 @@ You are the project-specific agent for `__PROJECT_NAME__`.
 ## Working Rules
 
 - Treat this file, `Memory.md`, and `Decisions.md` in this customer folder as the leading project truth.
-- Use `./.codex/bin/codex list` to inspect managed Tools, Skills, and MCPs.
+- Use `./.codex/bin/cdx list` to inspect managed Tools, Skills, and MCPs.
 - Use existing conventions before introducing new patterns.
 - Record durable project changes in `Memory.md`.
 - Record important decisions in `Decisions.md`.

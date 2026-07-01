@@ -26,13 +26,13 @@ source_init_lib() {
 usage() {
   cat <<'EOF'
 Usage:
-  ./.codex/bin/codex setup
-  ./.codex/bin/codex init
-  ./.codex/bin/codex add tool <name> --scope global|project
-  ./.codex/bin/codex add skill <name> --scope global|project
-  ./.codex/bin/codex add mcp <name> --scope global|project
-  ./.codex/bin/codex list [all|tools|skills|mcps] --scope global|project|both
-  ./.codex/bin/codex update [all|tools|skills|mcps] [name...] --scope global|project|both
+  ./.codex/bin/cdx setup
+  ./.codex/bin/cdx init
+  ./.codex/bin/cdx add tool <name> --scope global|project
+  ./.codex/bin/cdx add skill <name> --scope global|project
+  ./.codex/bin/cdx add mcp <name> --scope global|project
+  ./.codex/bin/cdx list [all|tools|skills|mcps] --scope global|project|both
+  ./.codex/bin/cdx update [all|tools|skills|mcps] [name...] --scope global|project|both
 EOF
 }
 

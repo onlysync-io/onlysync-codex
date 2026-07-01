@@ -2,7 +2,7 @@
 
 This repository is intended to live as `.codex` inside a customer code folder.
 
-After `codex init`, the only customer-facing project documents live one level above this repository:
+After `cdx init`, the only customer-facing project documents live one level above this repository:
 
 - `../Agents.md`
 - `../Memory.md`
@@ -15,8 +15,8 @@ The hidden repository owns only the technical runtime:
   README.md
   project.yaml
   bin/
-    codex
-    codex.ps1
+    cdx
+    cdx.ps1
   bootstrap/
     commands/
     lib/
@@ -36,23 +36,23 @@ The hidden repository owns only the technical runtime:
 ## Main Flow
 
 1. Clone this repository into the customer folder as `.codex`.
-2. Run `./.codex/bin/codex init`.
+2. Run `./.codex/bin/cdx init`.
 3. Answer the project questions.
 4. Manage extensions through the same CLI:
-   - `./.codex/bin/codex add ...`
-   - `./.codex/bin/codex list ...`
-   - `./.codex/bin/codex update ...`
+   - `./.codex/bin/cdx add ...`
+   - `./.codex/bin/cdx list ...`
+   - `./.codex/bin/cdx update ...`
 
 ## Commands
 
 ```bash
-./.codex/bin/codex setup
-./.codex/bin/codex init
-./.codex/bin/codex add tool <name> --scope global|project
-./.codex/bin/codex add skill <name> --scope global|project
-./.codex/bin/codex add mcp <name> --scope global|project
-./.codex/bin/codex list [all|tools|skills|mcps] --scope global|project|both
-./.codex/bin/codex update [all|tools|skills|mcps] [name...] --scope global|project|both
+./.codex/bin/cdx setup
+./.codex/bin/cdx init
+./.codex/bin/cdx add tool <name> --scope global|project
+./.codex/bin/cdx add skill <name> --scope global|project
+./.codex/bin/cdx add mcp <name> --scope global|project
+./.codex/bin/cdx list [all|tools|skills|mcps] --scope global|project|both
+./.codex/bin/cdx update [all|tools|skills|mcps] [name...] --scope global|project|both
 ```
 
 ## Rules
@@ -62,7 +62,7 @@ The hidden repository owns only the technical runtime:
 - `state/` stores managed metadata only.
 - `runtime/` stores project-local runtimes only.
 - `bootstrap/` is internal implementation.
-- Inventories are shown with `codex list`, not through generated blocks inside `Agents.md`.
+- Inventories are shown with `cdx list`, not through generated blocks inside `Agents.md`.
 
 ## MCP Notes
 
@@ -71,7 +71,7 @@ The managed macOS app MCP source is `macos-mcp`, backed by `krmj22/macos-mcp` an
 For a global install from this bootstrap:
 
 ```bash
-./bin/codex add mcp macos-mcp --scope global
+./bin/cdx add mcp macos-mcp --scope global
 ~/.codex/mcp/macos-mcp/check.sh
 ~/.codex/mcp/macos-mcp/verify-jxa.sh
 ```
