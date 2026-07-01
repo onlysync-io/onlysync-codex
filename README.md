@@ -170,7 +170,16 @@ Windows:
 
 Currently supported MCP sources:
 
+- `apple-calendar`
+- `apple-contacts`
+- `apple-mail`
+- `apple-maps`
+- `apple-messages`
+- `apple-notes`
+- `apple-reminders`
 - `imap`
+
+Global MCP installs also write a matching `[mcp_servers.<name>]` entry into `~/.codex/config.toml`, so Codex can pick them up without a separate manual config step.
 
 ## Structure
 

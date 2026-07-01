@@ -90,8 +90,18 @@ Only project-specific systems, channels, and access rules belong in this project
   Note: Project mode creates a local document runtime with Python and Node packages. Pandoc and the Homebrew PyMuPDF formula remain globally preferred native tools.
 <!-- CODEX_PROJECT_TOOL_BUNDLES_END -->
 
+
+
+
+
+
+
+
+
+
+
 <!-- CODEX_PROJECT_MCPS_START -->
 ## Managed Project MCP Servers
 
-- none
+
 <!-- CODEX_PROJECT_MCPS_END -->

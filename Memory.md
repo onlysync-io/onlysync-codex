@@ -103,6 +103,16 @@ This file is the shared project memory for this bootstrap repository.
   - MCP metadata now synchronizes into managed AGENTS blocks like tools and skills.
   - The first supported MCP source is `imap`, using upstream `npx` wrappers rather than a root `package.json`.
 
+### 2026-07-01 - Apple app MCP catalog replaced the earlier iCloud MCP draft
+
+- Trigger: a follow-up request to replace the earlier `MrGo2/icloud-mcp` draft with `griches/apple-mcp`.
+- Goal: model Apple app MCPs in a way that matches the bootstrap surface better, with one managed MCP source per actual upstream server.
+- Results:
+  - `.bootstrap/lib/mcp-catalog.sh` now exposes `apple-calendar`, `apple-contacts`, `apple-mail`, `apple-maps`, `apple-messages`, `apple-notes`, and `apple-reminders` instead of a single `icloud` source.
+  - The installer now creates lightweight `npx`-backed wrappers for each Apple MCP package published under `@griches`.
+  - Global installs also upsert the matching `[mcp_servers.<name>]` block in `~/.codex/config.toml`.
+  - Runtime notes per server document app-open requirements, Messages Full Disk Access, and optional safety flags such as `--read-only` and `--confirm-destructive`.
+
 ## Open Points
 
 - Optionally add more skill sources to the catalog later.

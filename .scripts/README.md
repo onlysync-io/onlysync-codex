@@ -59,7 +59,16 @@ These visible commands live under `.scripts/`. The real bootstrap logic lives un
 
 ## Currently Supported MCP Sources
 
+- `apple-calendar`
+- `apple-contacts`
+- `apple-mail`
+- `apple-maps`
+- `apple-messages`
+- `apple-notes`
+- `apple-reminders`
 - `imap`
+
+Global MCP installs also write the matching server entry into `~/.codex/config.toml`.
 
 ## Principles
 
