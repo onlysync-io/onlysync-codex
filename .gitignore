@@ -31,6 +31,10 @@ __pycache__/
 #   ../AGENTS.md
 #   ../Memory.md
 #   ../Decisions.md
+AGENTS.md
+Agents.md
+Memory.md
+Decisions.md
 state/tools/*.env
 state/skills/*.env
 state/mcps/*.env
